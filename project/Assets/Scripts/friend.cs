@@ -5,25 +5,56 @@ using UnityEngine;
 public class friend : MonoBehaviour
 {
     public GameObject managerObject;
-    private GameObject model;
     public Animator anim;
+    public string result;
     // Start is called before the first frame update
     void Start()
     {
-        model = this.gameObject.transform.GetChild(0).gameObject;
-        anim = model.GetComponent<Animator>();
+        anim = GetComponent<Animator>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        //this makes the friend leave 
-        if (anim.GetBool("leaving")) {
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, 180, 0), 5*Time.deltaTime);
-            if (transform.rotation.y < -0.98 && transform.position.z < 7)
-             {
-                 transform.position += new Vector3(0, 0, Time.deltaTime);
-             }
+        if (manager.convoNum == 0)
+        {
+            if (anim.GetBool("Entering"))
+            {
+                if (transform.position.z > 4)
+                {
+                    transform.position -= new Vector3(0, 0, 2 * Time.deltaTime);
+                }
+                else
+                {
+                    anim.SetBool("Entering", false);
+                    anim.SetBool("Talking", true);
+                }
+            }
+            else { manager.dialogueOpen = anim.GetBool("Talking"); }
+
+            if (anim.GetBool("GotDrink"))
+            {
+                StartCoroutine(CharacterFinishesDrinking());
+            }
+            if (anim.GetBool("Leaving")) {  
+                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, 0, 0), 5 * Time.deltaTime);
+                if (transform.rotation.y <0.2 && transform.position.z < 20)
+                {
+                    transform.position += new Vector3(0, 0, 2* Time.deltaTime);
+                }
+                if (transform.position.z >= 20) {
+                    manager.convoNum = 1;
+                }
+            }
         }
+    }
+
+    IEnumerator CharacterFinishesDrinking()
+    {
+        //yield on a new YieldInstruction that waits for 5 seconds.
+        yield return new WaitForSeconds(2);
+        managerObject.GetComponent<manager>().LoadNewStory(result);
+        anim.SetBool("GotDrink", false);
+        anim.SetBool("Talking", true);
     }
 }

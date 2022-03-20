@@ -1,8 +1,17 @@
 fileFormatVersion: 2
-guid: 649bdc1cc785dae46a7895d886f9b6f2
+guid: 3a8508bb5b3eaa14ab981ad880868a72
 ModelImporter:
   serializedVersion: 20200
-  internalIDToNameTable: []
+  internalIDToNameTable:
+  - first:
+      74: -5282591947630064529
+    second: Drink_Greg
+  - first:
+      74: -3100369314251171874
+    second: Idle
+  - first:
+      74: 2667949614841947897
+    second: Walk
   externalObjects: {}
   materials:
     materialImportMode: 2

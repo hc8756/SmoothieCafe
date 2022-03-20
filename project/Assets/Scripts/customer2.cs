@@ -1,50 +1,72 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 public class customer2 : MonoBehaviour
 {
     public GameObject managerObject;
-    private GameObject model;
     public Animator anim;
+    public string result;
     // Start is called before the first frame update
     void Start()
     {
-        model = this.gameObject.transform.GetChild(0).gameObject;
-        anim = model.GetComponent<Animator>();
+        anim = GetComponent<Animator>();
     }
 
-    // Update is called once per frame
     void Update()
     {
-        //this makes the customer come in
-        if (anim.GetBool("entering"))
+        if (manager.convoNum == 2)
         {
-            if (transform.position.z > 0)
+            if (anim.GetBool("Entering"))
             {
-                transform.position -= new Vector3(0, 0, Time.deltaTime);
+                if (transform.position.z > 4)
+                {
+                    transform.position -= new Vector3(0, 0, 2 * Time.deltaTime);
+                }
+                else
+                {
+                    anim.SetBool("Entering", false);
+                    managerObject.GetComponent<manager>().LoadNewStory("Convo2");
+                    anim.SetBool("Talking", true);
+                }
             }
             else
             {
-                anim.SetBool("entering", false);
-                anim.SetBool("standing", true);
+                manager.dialogueOpen = anim.GetBool("Talking");
             }
-        }
-        //this makes the friend leave 
-        if (anim.GetBool("standing"))
-        {
-            manager.convoNum = 2;
-            manager.dialogueOpen = true;
-        }
-        //this makes the customer leave 
-        else if (anim.GetBool("leaving"))
-        {
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, 180, 0), 5 * Time.deltaTime);
-            if (transform.rotation.y < -0.98 && transform.position.z < 7)
-            {
-                transform.position += new Vector3(0, 0, Time.deltaTime);
-            }
-        }
 
+            if (anim.GetBool("GotDrink"))
+            {
+                StartCoroutine(CharacterFinishesDrinking());
+            }
+            if (anim.GetBool("Leaving"))
+            {
+                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, 0, 0), 5 * Time.deltaTime);
+                if (transform.rotation.y < 0.2 && transform.position.z < 20)
+                {
+                    transform.position += new Vector3(0, 0, 2 * Time.deltaTime);
+                }
+                if (transform.position.z >= 20)
+                {
+                    manager.convoNum = -1;
+                }
+                StartCoroutine(LoadEnding());
+            }
+        }
+    }
+
+    IEnumerator CharacterFinishesDrinking()
+    {
+        yield return new WaitForSeconds(4);
+        managerObject.GetComponent<manager>().LoadNewStory(result);
+        anim.SetBool("GotDrink", false);
+        anim.SetBool("Talking", true);
+    }
+
+    IEnumerator LoadEnding()
+    {
+        yield return new WaitForSeconds(6);
+        SceneManager.LoadScene("Ending");
     }
 }
