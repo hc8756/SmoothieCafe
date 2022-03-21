@@ -23,7 +23,7 @@ public class player : MonoBehaviour
         if (Input.GetKey(KeyCode.A) && transform.position.x<5)
         {
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, 90, 0), 5 * Time.deltaTime);
-            transform.Translate(Vector3.right * Time.deltaTime * 2, Space.World);
+            transform.Translate(Vector3.right * Time.deltaTime * 4, Space.World);
             anim.SetBool("Moving", true);
         }
         if (Input.GetKey(KeyCode.S))
@@ -34,7 +34,7 @@ public class player : MonoBehaviour
         if (Input.GetKey(KeyCode.D) && transform.position.x>-5)
         {
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, -90, 0), 5 * Time.deltaTime);
-            transform.Translate(Vector3.left * Time.deltaTime * 2, Space.World);
+            transform.Translate(Vector3.left * Time.deltaTime * 4, Space.World);
             anim.SetBool("Moving", true);
         }
         if (!Input.anyKey)
