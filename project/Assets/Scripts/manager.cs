@@ -11,7 +11,7 @@ public class manager : MonoBehaviour
 {
     public static manager instance;
 
-    //sound manager
+    //sound 
     private AudioSource audioSource;
     public AudioClip blenderClip;
     public AudioClip pickupClip;
@@ -22,6 +22,7 @@ public class manager : MonoBehaviour
     public GameObject customer1;
     public GameObject customer2;
     private string[] names = { "Greg", "Kattie", "Tailsy" };
+
     //variables related to dialogue UI
     public Canvas dialogueBox;
     public static bool dialogueOpen;
@@ -42,6 +43,7 @@ public class manager : MonoBehaviour
     public GameObject bDrink;
     public GameObject sbDrink;
     public GameObject eDrink;
+
     //each num represents ice, strawberry, banana, milk
     private int[] smoothie0 = { 0, 0, 0, 0 };
     private int[] smoothie1 = { 0, 0, 0, 0 };
@@ -79,25 +81,31 @@ public class manager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //general dialogue box setup
         if (convoNum >= 0) { speakerName.text = names[convoNum]; }
         dialogueBox.enabled = dialogueOpen;
+        
         //if the story runs out of lines, close the dialogue box and judge if there is another convo that can happen
         if (speakerDialogue.text == "")
         {
             friend.GetComponent<friend>().anim.SetBool("Talking", false);
             customer1.GetComponent<customer1>().anim.SetBool("Talking", false);
-            //bug here no time to fix
             customer2.GetComponent<customer2>().anim.SetBool("Talking", false);
             if (convoName == "Convo0" || convoName == "Convo1" || convoName == "Convo2") {
                 canMakeSmoothie = true;
             }
-            if (convoName == "Convo0Good" || convoName == "Convo0Bad") { friend.GetComponent<friend>().anim.SetBool("Leaving", true); canMakeSmoothie = false; }
-            else if (convoName == "Convo1Good" || convoName == "Convo1Bad") { customer1.GetComponent<customer1>().anim.SetBool("Leaving", true); canMakeSmoothie = false; }
+            if (convoName == "Convo0Good" || convoName == "Convo0Bad") { 
+                canMakeSmoothie = false; 
+                friend.GetComponent<friend>().anim.SetBool("Leaving", true); 
+                
+            }
+            else if (convoName == "Convo1Good" || convoName == "Convo1Bad") { 
+                canMakeSmoothie = false; 
+                customer1.GetComponent<customer1>().anim.SetBool("Leaving", true); 
+            }
             else if (convoName == "Convo2Good" || convoName == "Convo2Bad") {
                 canMakeSmoothie = false;
                 customer2.GetComponent<customer2>().anim.SetBool("Leaving", true);
-                dialogueOpen = false;
-                dialogueBox.enabled = false;
             }
         }
 
@@ -113,10 +121,8 @@ public class manager : MonoBehaviour
                     {
                         StartCoroutine(WaitForBlender());
                         canMakeSmoothie = false;
-                        //canGiveSmoothie = true;
                         audioSource.PlayOneShot(blenderClip,0.6f);
                     }
-
                 }
 
                 else if (3 > player.GetComponent<Transform>().position.x && player.GetComponent<Transform>().position.x > 1)

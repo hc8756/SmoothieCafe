@@ -8,14 +8,19 @@ public class customer2 : MonoBehaviour
     public GameObject managerObject;
     public Animator anim;
     public string result;
+    public Image blackBox;
+    private CanvasGroup blackBoxCG;
     // Start is called before the first frame update
     void Start()
     {
         anim = GetComponent<Animator>();
+        blackBoxCG = blackBox.GetComponent<CanvasGroup>();
+        blackBoxCG.alpha = 0;
     }
 
     void Update()
     {
+        
         if (manager.convoNum == 2)
         {
             if (anim.GetBool("Entering"))
@@ -51,8 +56,12 @@ public class customer2 : MonoBehaviour
                 {
                     manager.convoNum = -1;
                 }
-                StartCoroutine(LoadEnding());
+                StartCoroutine(WaitEnding());
             }
+        }
+
+        if (blackBoxCG.alpha >= 1) {
+            SceneManager.LoadScene("Ending");
         }
     }
 
@@ -64,9 +73,9 @@ public class customer2 : MonoBehaviour
         anim.SetBool("Talking", true);
     }
 
-    IEnumerator LoadEnding()
+    IEnumerator WaitEnding()
     {
         yield return new WaitForSeconds(6);
-        SceneManager.LoadScene("Ending");
+        blackBoxCG.alpha += 0.3f * Time.deltaTime;
     }
 }

@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class player : MonoBehaviour
 {
-    public GameObject managerObject;
     public Animator anim;
     // Start is called before the first frame update
     void Start()
