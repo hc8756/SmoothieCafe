@@ -7,10 +7,9 @@ public class customer2 : MonoBehaviour
 {
     public GameObject managerObject;
     public Animator anim;
-    public string result;
     public Image blackBox;
     private CanvasGroup blackBoxCG;
-    // Start is called before the first frame update
+
     void Start()
     {
         anim = GetComponent<Animator>();
@@ -67,8 +66,7 @@ public class customer2 : MonoBehaviour
 
     IEnumerator CharacterFinishesDrinking()
     {
-        yield return new WaitForSeconds(4);
-        managerObject.GetComponent<manager>().LoadNewStory(result);
+        yield return new WaitForSeconds(2);
         anim.SetBool("GotDrink", false);
         anim.SetBool("Talking", true);
     }

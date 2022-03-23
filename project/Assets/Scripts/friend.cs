@@ -6,7 +6,6 @@ public class friend : MonoBehaviour
 {
     public GameObject managerObject;
     public Animator anim;
-    public string result;
 
     void Start()
     {
@@ -53,7 +52,6 @@ public class friend : MonoBehaviour
     IEnumerator CharacterFinishesDrinking()
     {
         yield return new WaitForSeconds(2);
-        managerObject.GetComponent<manager>().LoadNewStory(result);
         anim.SetBool("GotDrink", false);
         anim.SetBool("Talking", true);
     }

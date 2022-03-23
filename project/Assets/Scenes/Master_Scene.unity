@@ -1934,7 +1934,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   managerObject: {fileID: 1073503515}
   anim: {fileID: 0}
-  result: 
 --- !u!95 &386261709
 Animator:
   serializedVersion: 3
@@ -5133,7 +5132,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   managerObject: {fileID: 1073503515}
   anim: {fileID: 0}
-  result: 
   blackBox: {fileID: 1211282841}
 --- !u!95 &1257715206
 Animator:
@@ -6256,7 +6254,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   managerObject: {fileID: 1073503515}
   anim: {fileID: 0}
-  result: 
 --- !u!1001 &1882785353
 PrefabInstance:
   m_ObjectHideFlags: 0

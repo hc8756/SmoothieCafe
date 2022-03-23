@@ -44,14 +44,8 @@ public class manager : MonoBehaviour
     public GameObject sbDrink;
     public GameObject eDrink;
 
-    //each num represents ice, strawberry, banana, milk
-    private int[] smoothie0 = { 0, 0, 0, 0 };
-    private int[] smoothie1 = { 0, 0, 0, 0 };
-    private int[] smoothie2 = { 0, 0, 0, 0 };
-
-    private int[] order0 = { 1, 1, 1, 0 };
-    private int[] order1 = { 0, 1, 0, 1 };
-    private int[] order2 = { 1, 0, 1, 1 };
+    private int[,] smoothies;
+    private int[,] orders;
 
     private bool canMakeSmoothie = false;
     private bool canGiveSmoothie = false;
@@ -64,11 +58,11 @@ public class manager : MonoBehaviour
             Debug.LogWarning("Found more than one manager in scene");
         }
         instance = this;
+        audioSource= GetComponent<AudioSource>();
     }
 
     void Start()
     {
-        audioSource= GetComponent<AudioSource>();
         //dialogue related
         convoNum =0;
         convoName = String.Concat("Convo", convoNum);
@@ -76,16 +70,27 @@ public class manager : MonoBehaviour
         currentStory.ChoosePathString(convoName);
         dialogueOpen = false;
         ContinueStory();
+        //initialize 2D arrays for cooking
+        //each column represents ice, strawberries, bananas, and milk
+        smoothies =new int[,]{
+           { 0, 0, 0, 0 },
+           { 0, 0, 0, 0 },
+           { 0, 0, 0, 0 }
+        };
+        orders = new int[,]{
+            { 1, 1, 1, 0 },
+            { 0, 1, 0, 1 },
+            { 1, 0, 1, 1 }
+        };
     }
 
-    // Update is called once per frame
     void Update()
     {
-        //general dialogue box setup
+        //general dialogue setup
         if (convoNum >= 0) { speakerName.text = names[convoNum]; }
         dialogueBox.enabled = dialogueOpen;
-        
-        //if the story runs out of lines, close the dialogue box and judge if there is another convo that can happen
+
+        //if the story runs out of lines, close the dialogue box and alter correct variables depending on the conversation that just ended
         if (speakerDialogue.text == "")
         {
             friend.GetComponent<friend>().anim.SetBool("Talking", false);
@@ -97,7 +102,6 @@ public class manager : MonoBehaviour
             if (convoName == "Convo0Good" || convoName == "Convo0Bad") { 
                 canMakeSmoothie = false; 
                 friend.GetComponent<friend>().anim.SetBool("Leaving", true); 
-                
             }
             else if (convoName == "Convo1Good" || convoName == "Convo1Bad") { 
                 canMakeSmoothie = false; 
@@ -119,43 +123,35 @@ public class manager : MonoBehaviour
                     Instructions.text = "Press E to blend ingredients";
                     if (Input.GetKeyDown(KeyCode.E))
                     {
+                        Instructions.text = "";
                         StartCoroutine(WaitForBlender());
-                        canMakeSmoothie = false;
-                        audioSource.PlayOneShot(blenderClip,0.6f);
                     }
                 }
-
                 else if (3 > player.GetComponent<Transform>().position.x && player.GetComponent<Transform>().position.x > 1)
                 {
                     Instructions.text = "Press E to put ice in blender";
                     if (Input.GetKeyDown(KeyCode.E))
                     {
-                        if (convoNum == 0) { smoothie0[0] = 1; }
-                        if (convoNum == 1) { smoothie1[0] = 1; }
-                        if (convoNum == 2) { smoothie2[0] = 1; }
-                        audioSource.PlayOneShot(pickupClip, 2);
+                        smoothies[convoNum,0] = 1;
+                        audioSource.PlayOneShot(pickupClip, 1);
                     }
                 }
                 else if (1 > player.GetComponent<Transform>().position.x && player.GetComponent<Transform>().position.x >= 0)
                 {
                     Instructions.text = "Press E to put strawberries in blender";
-                    if (Input.GetKeyDown(KeyCode.E))
+                    if (Input.GetKeyDown(KeyCode.E) && canMakeSmoothie)
                     {
-                        if (convoNum == 0) { smoothie0[1] = 1; }
-                        if (convoNum == 1) { smoothie1[1] = 1; }
-                        if (convoNum == 2) { smoothie2[1] = 1; }
-                        audioSource.PlayOneShot(pickupClip, 2);
+                        smoothies[convoNum,1] = 1;
+                        audioSource.PlayOneShot(pickupClip, 1);
                     }
                 }
                 else if (0 > player.GetComponent<Transform>().position.x && player.GetComponent<Transform>().position.x > -3)
                 {
                     Instructions.text = "Press E to put bananas in blender";
-                    if (Input.GetKeyDown(KeyCode.E))
+                    if (Input.GetKeyDown(KeyCode.E) && canMakeSmoothie)
                     {
-                        if (convoNum == 0) { smoothie0[2] = 1; }
-                        if (convoNum == 1) { smoothie1[2] = 1; }
-                        if (convoNum == 2) { smoothie2[2] = 1; }
-                        audioSource.PlayOneShot(pickupClip, 2);
+                        smoothies[convoNum,2] = 1;
+                        audioSource.PlayOneShot(pickupClip, 1);
                     }
                 }
                 else if (-3 > player.GetComponent<Transform>().position.x)
@@ -163,10 +159,8 @@ public class manager : MonoBehaviour
                     Instructions.text = "Press E to put milk in blender";
                     if (Input.GetKeyDown(KeyCode.E))
                     {
-                        if (convoNum == 0) { smoothie0[3] = 1; }
-                        if (convoNum == 1) { smoothie1[3] = 1; }
-                        if (convoNum == 2) { smoothie2[3] = 1; }
-                        audioSource.PlayOneShot(pickupClip, 2);
+                        smoothies[convoNum,3] = 1;
+                        audioSource.PlayOneShot(pickupClip, 1);
                     }
                 }
                 else
@@ -174,14 +168,15 @@ public class manager : MonoBehaviour
                     Instructions.text = "";
                 }
             }
-            
             else
             {
                 Instructions.text = "";
             }
         }
 
-        if (canGiveSmoothie) { 
+        //if we finished the smoothie and are facing customer
+        if (canGiveSmoothie)
+        {
             if (Mathf.Abs(player.GetComponent<Transform>().eulerAngles.y) > 280 || 20 > Mathf.Abs(player.GetComponent<Transform>().eulerAngles.y))
             {
                 if (1 > player.GetComponent<Transform>().position.x && player.GetComponent<Transform>().position.x > -1)
@@ -189,48 +184,49 @@ public class manager : MonoBehaviour
                     Instructions.text = "Press E to give drink to customer";
                     if (Input.GetKeyDown(KeyCode.E))
                     {
+                        Instructions.text = "";
                         sbDrink.SetActive(false);
                         sDrink.SetActive(false);
                         bDrink.SetActive(false);
                         eDrink.SetActive(false);
+                        canGiveSmoothie = false;
+                        canMakeSmoothie = false;
                         if (convoNum == 0)
                         {
                             friend.GetComponent<friend>().anim.SetBool("GotDrink", true);
-                            if (CompareArray(smoothie0, order0))
+                            if (CompareArray(smoothies, orders, 0))
                             {
-                                friend.GetComponent<friend>().result = "Convo0Good";
+                                LoadNewStory("Convo0Good");
                             }
                             else
                             {
-                                friend.GetComponent<friend>().result = "Convo0Bad";
+                                LoadNewStory("Convo0Bad");
                             }
                         }
                         if (convoNum == 1)
                         {
                             customer1.GetComponent<customer1>().anim.SetBool("GotDrink", true);
-                            if (CompareArray(smoothie1, order1))
+                            if (CompareArray(smoothies, orders, 1))
                             {
-                                customer1.GetComponent<customer1>().result = "Convo1Good";
+                                LoadNewStory("Convo1Good");
                             }
                             else
                             {
-                                customer1.GetComponent<customer1>().result = "Convo1Bad";
+                                LoadNewStory("Convo1Bad");
                             }
                         }
                         if (convoNum == 2)
                         {
                             customer2.GetComponent<customer2>().anim.SetBool("GotDrink", true);
-                            if (CompareArray(smoothie2, order2))
+                            if (CompareArray(smoothies, orders, 2))
                             {
-                                customer2.GetComponent<customer2>().result = "Convo2Good";
+                                LoadNewStory("Convo2Good");
                             }
                             else
                             {
-                                customer2.GetComponent<customer2>().result = "Convo2Bad";
+                                LoadNewStory("Convo2Bad");
                             }
                         }
-                        canGiveSmoothie = false;
-                        canMakeSmoothie = false;
                     }
                 }
                 else
@@ -265,15 +261,14 @@ public class manager : MonoBehaviour
 
     public void LoadNewStory(string newConvo) {
         convoName = newConvo;
-        currentStory = new Story(inkJSON.text);
-        currentStory.ChoosePathString(convoName);
+        currentStory.ChoosePathString(newConvo);
         ContinueStory();
     }
 
-    private bool CompareArray(int[] a1, int[] a2) {
+    private bool CompareArray(int[,] a1, int[,] a2, int rowNum) {
         bool equals = true;
-        for (int i = 0; i < 4; i++) {
-            if (a1[i] != a2[i]) { equals = false; }
+        for (int i = 0; i < 4; i++) { 
+            if (a1[rowNum,i] != a2[rowNum, i]) { equals = false; } 
         }
         return equals;
     }
@@ -281,64 +276,25 @@ public class manager : MonoBehaviour
     //wait for blender to run and then create drink
     IEnumerator WaitForBlender()
     {
+        audioSource.PlayOneShot(blenderClip, 0.4f);
+        convoName = "";
+        canMakeSmoothie = false;
         yield return new WaitForSeconds(4);
         canGiveSmoothie = true;
-        if (convoNum == 0) {
-            if (smoothie0[1] == 1 && smoothie0[2] == 1)
-            {
-                sbDrink.SetActive(true);
-            }
-            else if (smoothie0[1] == 1)
-            {
-                sDrink.SetActive(true);
-            }
-            else if (smoothie0[2] == 1)
-            {
-                bDrink.SetActive(true);
-            }
-            else {
-                eDrink.SetActive(true);
-            }
-        }
-
-        if (convoNum == 1)
+        if (smoothies[convoNum,1] == 1 && smoothies[convoNum, 2] == 1)
         {
-            if (smoothie1[1] == 1 && smoothie1[2] == 1)
-            {
-                sbDrink.SetActive(true);
-            }
-            else if (smoothie1[1] == 1)
-            {
-                sDrink.SetActive(true);
-            }
-            else if (smoothie1[2] == 1)
-            {
-                bDrink.SetActive(true);
-            }
-            else
-            {
-                eDrink.SetActive(true);
-            }
+            sbDrink.SetActive(true);
         }
-
-        if (convoNum == 2)
+        else if (smoothies[convoNum, 1] == 1)
         {
-            if (smoothie2[1] == 1 && smoothie2[2] == 1)
-            {
-                sbDrink.SetActive(true);
-            }
-            else if (smoothie2[1] == 1)
-            {
-                sDrink.SetActive(true);
-            }
-            else if (smoothie2[2] == 1)
-            {
-                bDrink.SetActive(true);
-            }
-            else
-            {
-                eDrink.SetActive(true);
-            }
+            sDrink.SetActive(true);
+        }
+        else if (smoothies[convoNum, 2] == 1)
+        {
+            bDrink.SetActive(true);
+        }
+        else {
+            eDrink.SetActive(true);
         }
     }
 }

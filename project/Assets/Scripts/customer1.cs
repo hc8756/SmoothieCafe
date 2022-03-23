@@ -6,14 +6,12 @@ public class customer1 : MonoBehaviour
 {
     public GameObject managerObject;
     public Animator anim;
-    public string result;
-    // Start is called before the first frame update
+
     void Start()
     {
         anim = GetComponent<Animator>();
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (manager.convoNum == 1)
@@ -55,8 +53,7 @@ public class customer1 : MonoBehaviour
 
     IEnumerator CharacterFinishesDrinking()
     {
-        yield return new WaitForSeconds(4);
-        managerObject.GetComponent<manager>().LoadNewStory(result);
+        yield return new WaitForSeconds(2);
         anim.SetBool("GotDrink", false);
         anim.SetBool("Talking", true);
     }
