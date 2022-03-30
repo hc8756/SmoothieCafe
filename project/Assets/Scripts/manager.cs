@@ -89,7 +89,6 @@ public class manager : MonoBehaviour
         //general dialogue setup
         if (convoNum >= 0) { speakerName.text = names[convoNum]; }
         dialogueBox.enabled = dialogueOpen;
-
         //if the story runs out of lines, close the dialogue box and alter correct variables depending on the conversation that just ended
         if (speakerDialogue.text == "")
         {
@@ -115,8 +114,8 @@ public class manager : MonoBehaviour
 
         //if we are currently in smoothie making mode && player is facing ingredients
         if (canMakeSmoothie)
-        { 
-            if (Mathf.Abs(player.GetComponent<Transform>().eulerAngles.y) > 150 && 200 > Mathf.Abs(player.GetComponent<Transform>().eulerAngles.y))
+        {
+            if (playerAngle() > -120 && -60 > playerAngle())
             {
                 if (player.GetComponent<Transform>().position.x > 3)
                 {
@@ -177,7 +176,7 @@ public class manager : MonoBehaviour
         //if we finished the smoothie and are facing customer
         if (canGiveSmoothie)
         {
-            if (Mathf.Abs(player.GetComponent<Transform>().eulerAngles.y) > 280 || 20 > Mathf.Abs(player.GetComponent<Transform>().eulerAngles.y))
+            if (playerAngle() > 60 && 120 > playerAngle())
             {
                 if (1 > player.GetComponent<Transform>().position.x && player.GetComponent<Transform>().position.x > -1)
                 {
@@ -296,5 +295,9 @@ public class manager : MonoBehaviour
         else {
             eDrink.SetActive(true);
         }
+    }
+
+    private float playerAngle() {
+        return Mathf.Atan2(player.GetComponent<Transform>().forward.z, player.GetComponent<Transform>().forward.x) * Mathf.Rad2Deg;
     }
 }
